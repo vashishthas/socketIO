@@ -20,11 +20,11 @@ io.on("connection", (socket) => {
 //     clients[id] = socket;
 //     console.log(clients);
 //   });
-//   socket.on("message", (msg) => {
-//     console.log(msg);
-//     let targetId = msg.targetId;
-//     if (clients[targetId]) clients[targetId].emit("message", msg);
-//   });
+  socket.on("message", (msg) => {
+    console.log(msg);
+    // let targetId = msg.targetId;
+    // if (clients[targetId]) clients[targetId].emit("message", msg);
+  });
 });
 
 server.listen(port, "0.0.0.0", () => {

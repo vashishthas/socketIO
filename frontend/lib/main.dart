@@ -31,11 +31,15 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
+  TextEditingController textController1 = TextEditingController();
+  TextEditingController textController2 = TextEditingController();
+  TextEditingController textController3 = TextEditingController();
+  String items,id,rad;
 
   IO.Socket socket;
 
   @override
-  void initState(){
+  void initState() {
     super.initState();
     connect();
   }
@@ -43,22 +47,30 @@ class _MyHomePageState extends State<MyHomePage> {
   void _incrementCounter() {
     setState(() {
       _counter++;
+      connect();
     });
   }
 
-  void connect(){
-    socket=IO.io("http://192.168.29.181:5000",<String,dynamic>{
-      "transports":["websocket"],
-      "autoconnect":false,
+  void connect() {
+    socket = IO.io("http://192.168.29.181:5000", <String, dynamic>{
+      "transports": ["websocket"],
+      "autoconnect": false,
     });
     socket.connect();
-    socket.emit("/test", "Hello world");
-    socket.onConnect((data)=> print("Connected"));
+    // socket.emit("/test", "Grocery,Meds,Fruits" + _counter.toString());
+    socket.onConnect((data) => print("Connected"));
     print(socket.connected);
+  }
+
+  void sendMessage(String sourceId, String message, String radius) {
+    socket.emit("message",
+        {"sourceId": sourceId, "List of items": message, "radius": radius});
   }
 
   @override
   Widget build(BuildContext context) {
+    TextStyle textStyle = Theme.of(context).textTheme.subtitle1;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
@@ -74,6 +86,67 @@ class _MyHomePageState extends State<MyHomePage> {
               '$_counter',
               style: Theme.of(context).textTheme.headline4,
             ),
+            Padding(
+              padding: EdgeInsets.only(top: 15.0, bottom: 15.0),
+              child: TextField(
+                controller: textController1,
+                style: textStyle,
+                onChanged: (value) {
+                  debugPrint('Value 1 added');
+                  // updateTitle();
+                },
+                decoration: InputDecoration(
+                    labelStyle: textStyle,
+                    labelText: "ID",
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(5.0))),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.only(top: 15.0, bottom: 15.0),
+              child: TextField(
+                controller: textController2,
+                style: textStyle,
+                onChanged: (value) {
+                  debugPrint('Value 2 added');
+                  // updateTitle();
+                },
+                decoration: InputDecoration(
+                    labelStyle: textStyle,
+                    labelText: "List of items",
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(5.0))),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.only(top: 15.0, bottom: 15.0),
+              child: TextField(
+                controller: textController3,
+                style: textStyle,
+                onChanged: (value) {
+                  debugPrint('Value 3 added');
+                  // updateTitle();
+                },
+                decoration: InputDecoration(
+                    labelStyle: textStyle,
+                    labelText: "Radius",
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(5.0))),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.only(top: 15.0, bottom: 15.0),
+              child: ElevatedButton(
+                child: Text("Send"),
+                onPressed:(){
+                  setState(() {
+                    debugPrint("List send");
+                    sendMessage(textController1.text, 
+                    textController2.text, textController3.text);
+
+                  });
+                } ,),  
+            )
           ],
         ),
       ),
