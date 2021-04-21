@@ -7,7 +7,7 @@ var io = require("socket.io")(server);
 
 //middlewre
 app.use(express.json());
-// var clients = {};
+var clients = {};
 
 io.on("connection", (socket) => {
   console.log("connetetd");
@@ -21,9 +21,15 @@ io.on("connection", (socket) => {
 //     console.log(clients);
 //   });
   socket.on("message", (msg) => {
+    // reply=msg[radius];
     console.log(msg);
-    // let targetId = msg.targetId;
-    // if (clients[targetId]) clients[targetId].emit("message", msg);
+    clients[1]=socket;
+    // console.log(clients)
+    // let targetId = msg[targetId];
+    // if (clients[1]) 
+    // clients[1].emit("reply", "010"+JSON.stringify(msg));
+    socket.emit("reply", "010"+JSON.stringify(msg));
+    console.log("reply done")
   });
 });
 

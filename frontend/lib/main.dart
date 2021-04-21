@@ -29,7 +29,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  // int _counter = 0;
+  String replyList="";
 
   TextEditingController textController1 = TextEditingController();
   TextEditingController textController2 = TextEditingController();
@@ -44,12 +45,12 @@ class _MyHomePageState extends State<MyHomePage> {
     connect();
   }
 
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-      connect();
-    });
-  }
+  // void _incrementCounter() {
+  //   setState(() {
+  //     _counter++;
+  //     connect();
+  //   });
+  // }
 
   void connect() {
     socket = IO.io("http://192.168.29.181:5000", <String, dynamic>{
@@ -58,13 +59,23 @@ class _MyHomePageState extends State<MyHomePage> {
     });
     socket.connect();
     // socket.emit("/test", "Grocery,Meds,Fruits" + _counter.toString());
-    socket.onConnect((data) => print("Connected"));
+    // socket.onConnect((data) => print("Connected"));
+    socket.onConnect((data) {
+      print("Connected");
+      // socket.on("reply", (data) => replyList=data);
+      
+      });
     print(socket.connected);
   }
 
   void sendMessage(String sourceId, String message, String radius) {
     socket.emit("message",
         {"sourceId": sourceId, "List of items": message, "radius": radius});
+    // socket.on("reply", (data) => replyList=data);
+    socket.on("reply", (data) {
+      replyList=data;
+      print(data);
+    });
   }
 
   @override
@@ -75,17 +86,17 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: Center(
+      body: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
+            // Text(
+            //   'You have pushed the button this many times:',
+            // ),
+            // Text(
+            //   '$_counter',
+            //   style: Theme.of(context).textTheme.headline4,
+            // ),
             Padding(
               padding: EdgeInsets.only(top: 15.0, bottom: 15.0),
               child: TextField(
@@ -139,22 +150,43 @@ class _MyHomePageState extends State<MyHomePage> {
               child: ElevatedButton(
                 child: Text("Send"),
                 onPressed:(){
+                  // connect();
                   setState(() {
+                    connect();
                     debugPrint("List send");
                     sendMessage(textController1.text, 
                     textController2.text, textController3.text);
 
                   });
                 } ,),  
+            ),
+
+            Padding(
+              padding: EdgeInsets.only(top: 15.0, bottom: 15.0),
+              child: ElevatedButton(
+                child: Text("Refresh"),
+                onPressed:(){
+                  // connect();
+                  setState(() {
+                    connect();
+                  });
+                },
+                ),  
+            ),
+
+            Padding(
+              padding: EdgeInsets.only(top: 15.0, bottom: 15.0),
+              child: Text(replyList),
             )
+
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: _incrementCounter,
+      //   tooltip: 'Increment',
+      //   child: Icon(Icons.add),
+      // ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
